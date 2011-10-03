@@ -2,36 +2,57 @@
 #{set title:'Home' /}
 
 #{ifnot tasks}
-<p>
+<p id="no-tasks">
     No tasks
 </p>
 #{/ifnot}
 
-<ul>
-    #{list items:tasks, as:'task'}
+<ol class="not-done">
+#{list items:tasks, as:'task'}
+    #{ifnot task.done}
     <li>
         <input type="checkbox" id="${task.id}" ${task.done ? 'checked' : ''} />
-        ${task.title}
+        <label for="${task.id}">${task.title}</label>
     </li>
-    #{/list}
-</ul>
+    #{/ifnot}
+#{/list}
+</ol>
 
 <p>
     <a id="createTask" href="#">Create a new task</a>
 </p>
 
+<ol class="done">
+#{list items:tasks, as:'task'}
+    #{if task.done}
+    <li>
+        <input type="checkbox" id="${task.id}" ${task.done ? 'checked' : ''} />
+        <label for="${task.id}">${task.title}</label>
+    </li>
+    #{/if}
+#{/list}
+</ol>
+
 <script type="text/javascript" charset="UTF-8">
     $('#createTask').click(function() {
         $.post('@{createTask()}', {title: prompt('Task title')}, function(task){
-            $('ul').prepend(
-                '<li><input type="checkbox" id="'+task.id+'" />'+task.title+'</li>'
+            $('.not-done').prepend(
+                '<li><input type="checkbox" id="'+task.id+'" /></li><label for="'+task.id+'">'+task.title+'</label>'
             );
+              
+            if ($('#no-tasks').is(":visible")) {
+              $('#no-tasks').hide();
+            }
         });
     })
     
     // change status
     $('input').live('click', function() {
-        console.log($(this).val(), $(this).attr('id'));
         $.post('@{changeStatus()}', {id: $(this).attr('id'), done: $(this).is(':checked')});
+        if ($(this).is(':checked')) {
+            $('.done').prepend($(this).parent().remove());
+        } else {
+            $('.not-done').prepend($(this).parent().remove());
+        }
     })
 </script>

@@ -1,0 +1,13 @@
+* {
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    line-height: 16px;
+}
+
+.done {
+    color: #666;
+    text-decoration: line-through;
+}
+label {
+    cursor: pointer;
+}
